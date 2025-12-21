@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App</title>
+    <style>
+        /* --- CSS --- */
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-container: linear-gradient(135deg, #6391b8, #022c4e);
+            --bg-todo-app: #ffffff;
+            --text-color: #002765;
+            --input-bg: #edeef0;
+            --button-bg: #20496d;
+            --button-text: #ffffff;
+            --list-text: #000000;
+            --list-checked: #555;
+            --circle-bg: #ccc;
+            --circle-checked: #0f0;
+            --delete-hover: #edeef0;
+        }
+
+        [data-theme="dark"] {
+            --bg-container: linear-gradient(135deg, #2e3b4e, #0a0f1a);
+            --bg-todo-app: #1e2a3c;
+            --text-color: #e0e0e0;
+            --input-bg: #2a3b4e;
+            --button-bg: #3b5998;
+            --button-text: #e0e0e0;
+            --list-text: #e0e0e0;
+            --list-checked: #888;
+            --circle-bg: #555;
+            --circle-checked: #00cc00;
+            --delete-hover: #3b4a6b;
+        }
+
+        .container {
+            width: 100%;
+            min-height: 100vh;
+            background: var(--bg-container);
+            padding: 10px;
+        }
+
+        .todo-app {
+            width: 100%;
+            max-width: 540px;
+            background: var(--bg-todo-app);
+            margin: 100px auto 20px;
+            padding: 40px 30px 70px;
+            border-radius: 10px;
+        }
+
+        .todo-app h2 {
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--input-bg);
+            border-radius: 30px;
+            padding-left: 20px;
+            margin-bottom: 25px;
+        }
+
+        input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            padding: 10px;
+            font-weight: 14px;
+            color: var(--list-text);
+        }
+
+        button {
+            border: none;
+            outline: none;
+            padding: 16px 50px;
+            background: var(--button-bg);
+            color: var(--button-text);
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 40px;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: var(--button-bg);
+            color: var(--button-text);
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        ul li {
+            list-style: none;
+            font-size: 17px;
+            padding: 12px 8px 12px 50px;
+            user-select: none;
+            cursor: pointer;
+            position: relative;
+            color: var(--list-text);
+        }
+
+        ul li::before {
+            content: '';
+            position: absolute;
+            height: 28px;
+            width: 28px;
+            border-radius: 50%;
+            background-color: var(--circle-bg);
+            top: 12px;
+            left: 8px;
+        }
+
+        ul li.checked {
+            color: var(--list-checked);
+            text-decoration: line-through;
+        }
+
+        ul li.checked::before {
+            background-color: var(--circle-checked);
+        }
+
+        ul li span {
+            position: absolute;
+            right: 0;
+            top: 5px;
+            width: 40px;
+            height: 40px;
+            font-size: 22px;
+            color: var(--list-checked);
+            line-height: 40px;
+            text-align: center;
+            border-radius: 50%;
+        }
+
+        ul li span:hover {
+            background: var(--delete-hover);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <button class="theme-toggle">Toggle Theme</button>
+    <div class="todo-app">
+        <h2>To-Do List</h2>
+        <div class="row">
+            <input type="text" id="input-box" placeholder="Add your text">
+            <button>Add</button>
+        </div>
+        <ul id="list-container"></ul>
+    </div>
+</div>
+
+<script>
+    const inputBox = document.getElementById("input-box");
+    const listContainer = document.getElementById("list-container");
+    const themeToggle = document.querySelector(".theme-toggle");
+    let nextId = 1;
+
+
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+    }
+
+    function setCookie(name, value, days) {
+        let expires = "";
+        if (days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = `${name}=${encodeURIComponent(value)}${expires}; path=/`;
+    }
+
+    function applyTheme(theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+        themeToggle.textContent = theme === "light" ? "Dark Theme" : "Light Theme";
+    }
+
+    function toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
+        const newTheme = currentTheme === "light" ? "dark" : "light";
+        applyTheme(newTheme);
+        setCookie("theme", newTheme, 7);
+    }
+
+    function loadTheme() {
+        const theme = getCookie("theme") || "light";
+        applyTheme(theme);
+    }
+
+    function getTodos() {
+        const todosJson = getCookie("todos") || "[]";
+        try {
+            return JSON.parse(decodeURIComponent(todosJson));
+        } catch (e) {
+            console.error('Error parsing todos cookie:', e);
+            return [];
+        }
+    }
+
+    function saveTodos(todos) {
+        setCookie("todos", JSON.stringify(todos), 7);
+    }
+
+    function showTask() {
+        const todos = getTodos();
+        listContainer.innerHTML = '';
+        todos.forEach(todo => {
+            let li = document.createElement("li");
+            li.dataset.id = todo.id;
+            li.innerHTML = todo.text;
+            if (todo.completed) li.classList.add("checked");
+            let span = document.createElement("span");
+            span.innerHTML = "\u00d7";
+            li.appendChild(span);
+            listContainer.appendChild(li);
+        });
+        nextId = todos.length > 0 ? Math.max(...todos.map(t => t.id)) + 1 : 1;
+    }
+
+    function addTask() {
+        const value = inputBox.value.trim();
+        if (!value) {
+            alert("You must write something");
+            return;
+        }
+        const todos = getTodos();
+        const newTodo = { id: nextId++, text: value, completed: false };
+        todos.push(newTodo);
+        saveTodos(todos);
+        inputBox.value = "";
+        showTask();
+    }
+
+    function toggleTask(id, completed) {
+        const todos = getTodos();
+        const todo = todos.find(t => t.id === id);
+        if (todo) {
+            todo.completed = completed;
+            saveTodos(todos);
+        }
+    }
+
+    function deleteTask(id) {
+        const todos = getTodos();
+        const updatedTodos = todos.filter(t => t.id !== id);
+        saveTodos(updatedTodos);
+        showTask();
+    }
+
+    listContainer.addEventListener("click", function (e) {
+        const li = e.target.tagName === "LI" ? e.target : e.target.parentElement;
+        if (!li || !li.dataset.id) return;
+        const id = parseInt(li.dataset.id);
+        if (e.target.tagName === "LI") {
+            const wasChecked = li.classList.contains("checked");
+            li.classList.toggle("checked");
+            toggleTask(id, !wasChecked);
+        } else if (e.target.tagName === "SPAN") {
+            deleteTask(id);
+        }
+    }, false);
+
+    document.querySelector('button:not(.theme-toggle)').addEventListener('click', addTask);
+    inputBox.addEventListener('keypress', e => { if (e.key === 'Enter') addTask(); });
+    themeToggle.addEventListener('click', toggleTheme);
+
+    loadTheme();
+    showTask();
+</script>
+</body>
+</html>
