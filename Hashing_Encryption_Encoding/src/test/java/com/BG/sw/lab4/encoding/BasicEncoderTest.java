@@ -1,4 +1,4 @@
-package com.vizja.sw.lab4.encoding;
+package com.BG.sw.lab4.encoding;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

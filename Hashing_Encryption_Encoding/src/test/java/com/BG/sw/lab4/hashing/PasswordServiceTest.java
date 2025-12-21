@@ -1,4 +1,4 @@
-package com.vizja.sw.lab4.hashing;
+package com.BG.sw.lab4.hashing;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;

@@ -1,4 +1,4 @@
-package com.vizja.sw.lab4.encryptions;
+package com.BG.sw.lab4.encryptions;
 
 import org.junit.jupiter.api.Test;
 
