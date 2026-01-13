@@ -1,0 +1,3 @@
+GET http://localhost:8080/api/accounts
+Content-Type: application/json
+X-API-KEY: DtbmZJElTDIxlTCINKFevvPVdFc587R5OjN-Fr0ya2E
