@@ -1,0 +1,17 @@
+### GET request to example server
+
+GET http://localhost:8080/api/accounts
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3NjgyNTc3OTE5MzgsInN1YiI6IkpvaG5fZG9lIiwicm9sZSI6IlVTRVIiLCJleHAiOjE3NjgyNjEzOTE5Mzh9.Us6qamYr9XNlpRuYwHRCYZT2f14uDdT8yKfLodTaiPQ
+
+
+###
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "username": "Michael454",
+  "password": "masi"
+}
+###
+// supppersecretkeyyy - Is my JWT key
